@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent; 
 import java.awt.event.KeyListener;
+import java.nio.channels.WritableByteChannel;
 import java.util.Random;
 import java.awt.Color;
 
@@ -19,11 +20,13 @@ public class FlappyPanel extends JPanel implements KeyListener ,ActionListener{
     int flappyHeight = Height/4;
     int flappyVelocity =0,flappyAccelearation =8,flappyImpulse = 1;   //basically velocity is moving down or up  ||  accelearation controls velocity status ||  impulse (which is adding up on accleration ) is max of flappy jumping tendency 
     // int wallx = Width+10;
+    int score =0;
     int wallx [] = {Width,Width+ Width/2};
     // int gapOfWall  = r.nextInt(200);
-    int gapOfWall[]  = {r.nextInt(150),r.nextInt(170)};
+    int gapOfWall[]  = {r.nextInt(160 ),r.nextInt(170)};
     
     public boolean gameOver = false;
+    public Timer t=new Timer(100,this);
      
 
     public FlappyPanel(){
@@ -32,7 +35,6 @@ public class FlappyPanel extends JPanel implements KeyListener ,ActionListener{
         addKeyListener(this);
 
         setBackground(Color.BLACK);
-        new Timer(100,this).start();
     }
 
     
@@ -74,11 +76,18 @@ public class FlappyPanel extends JPanel implements KeyListener ,ActionListener{
     }
     private void repeater(){
         for(int  i=0;i<2;i++){
-            if(wallx[i] <=100 && wallx[i]+WallWidth >=100){            //75+25 pixel sixe
-                if((flappyHeight + flappyVelocity) >=0  && (flappyHeight +flappyVelocity) <=gapOfWall[i]
-                || (flappyHeight + flappyVelocity +25 >= (gapOfWall[i]+100))  && (flappyHeight+flappyVelocity +25)<= Height){
+            if(wallx[i] <=100 && wallx[i]+WallWidth >=100 || wallx[i] <=75 && Width >=75){            //75+25 pixel sixe
+                if((flappyHeight + flappyVelocity) >=0  && (flappyHeight +flappyVelocity) <=gapOfWall[i] ||
+                 (flappyHeight + flappyVelocity +25 >= (gapOfWall[i]+100))  && (flappyHeight+flappyVelocity +25)<= Height){
                     gameOver = true;
                 }
+            }
+            if(flappyHeight + flappyVelocity <=0 || flappyHeight+flappyVelocity+25 >=Height){
+                gameOver = true;
+            }
+            
+            if( 75 > wallx[i]   + WallWidth){
+                score++;
             }
             if(wallx[i]+WallWidth<=0){
                 if(i==0){ 
@@ -109,6 +118,22 @@ public class FlappyPanel extends JPanel implements KeyListener ,ActionListener{
         int keyss = e.getKeyCode();
         if(keyss == KeyEvent.VK_SPACE){
             flappyAccelearation = -8;
+        }
+        if(keyss == KeyEvent.VK_S){
+            t.start();
+        }
+        if(keyss == e.VK_R){
+            t.stop();
+             flappyHeight = Height/4;
+            flappyVelocity =0;
+            flappyAccelearation =8;
+            wallx[0] = Width;
+            score=0;
+            wallx[1] = Width + Width/2;
+            gapOfWall[0]= r.nextInt(160);
+            gapOfWall[1]=r.nextInt(170);
+            gameOver = false;
+            repaint();
         }
         
     }
